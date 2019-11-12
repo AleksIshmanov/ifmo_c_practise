@@ -1,112 +1,74 @@
-#include <stdio.h>
+#include<stdio.h>
 #include <stdlib.h>
 
 #define TRUE 1
 #define FALSE 0
 
-
-void mathAction(const char sign, char *left, char *right) {
-    int leftInt = atoi(left);
-    int rightInt = atoi(right);
-
-    switch (sign) {
-        case '+': leftInt+=rightInt; break;
-        case '-': leftInt-=rightInt; break;
-        case '*': leftInt*=rightInt; break;
-        case '/': leftInt/=rightInt; break;
-    }
-
-    sprintf(left,"%d",leftInt);
-    printf("_%s ", left);
+int mathAction(int left, int right, char sign){
+	switch(sign){
+		case '+' : return left+right;break; 
+		case '-' : return left-right;break; 
+		case '*' : return left*right;break; 
+		case '/' : return left/right;break;
+		default: 
+			printf("\nSign [%c] incorrect", sign);
+			exit(1); 
+	}
 }
 
-//проверяет является ли математическим знаком
-//в случае ошибки завершает приложение
 int isMathSign(const char sign){
-    char signs[4] = {'+','-','*','/'};
-    char nums[10] = {'0','1','2','3','4','5','6','7','8','9'};
+	char signs[4]= "+-*/";
+	
+	for(int i=0;i<4;i++)
+		if(sign==signs[i])
+			return TRUE;
 
-		printf("%c ", sign);
-
-    for (int i=0;i<4;i++) {
-        if(sign==signs[i]){
-            return TRUE;
-        }
-    }
-
-    for (int i=0;i<10;i++) {
-        if(sign==nums[i]){
-            return FALSE;
-        }
-    }
-
-    //попадем сюда в случае, если не мат. символ и не число
-    printf("Incorrect character inside the equation: [%c] -> ASCII[%d]", sign, sign);
-    exit(0);
+	return FALSE;
 }
 
+int isNum(const char sign){
+	return (sign>=48 && sign<=57) ? TRUE : FALSE;
+}
 
-/**
- * Рекурсивная функция для определения числа слева от математического знака 
- *
- * @return int размер полученного числа
- * @change char* leftNumCharArray - динамически изменяет его размер и содержимое 
-*/
-void getLeftNum(char* leftNumCharArray, char* str, int count){
-	if(isMathSign(str[count])){ //условие выхода - символ является математическим знаком
-		leftNumCharArray = malloc(count*sizeof(str[0])); //создаем число в формате char[Count-1] размером в количество найденных рекурсий
-		printf("\n%d %d ", count*sizeof(str[0]), count);
-		return;
+int getNum(char* str, int *index)
+{
+	int buffer = 0;
+
+	int c = *index;
+	while(isNum(str[c])){
+		buffer = buffer * 10 + (str[c]-48);
+		c++;
+		*index = c;
 	}
 
-	//leftNumCharArray = (char*) realloc(leftNumCharArray, count*sizeof(str[0]));
-	getLeftNum(leftNumCharArray, str, count+1); //рекурсия
-	printf("\nggwp %s %d\n", leftNumCharArray, count);
-	leftNumCharArray[count] = str[count]; //присваиваем значения
+	//Проверка на некорректные символы
+	if(!isMathSign){
+		printf("\nSign [%c] incorrect", str[c]);
+		exit(1);
+	}
+
+	return buffer;	
 }
 
+int main()
+{
+  char str[254];
+  scanf("%s", str);
+	
+	int index=0;
 
-int main(){
-    char str[256], left[10], right[10];;
-    scanf("%s",str);
+	//заполняем первое число, 
+	int result = getNum(str, &index);
+	char sign = str[index];
+	index++;
 
-    int i=0;
-    int lenLeft=0, lenRight=0; //длина строки, нужна в качества индекса для
+	while(str[index-1]!=0){
+		int rightNum = getNum(str, &index);
+		result = mathAction(result, rightNum, sign);
+		sign = str[index];
+		index++;
+	}
 
-    char sign;
-   
-	  char *leftNumCharArray;	
-		getLeftNum(leftNumCharArray, str, 0);//получаем первое число
-		
-		printf("done");
-
-  //  for(int i=0;i<len;i++) printf("%d ", leftNumCharArray[i]);
-		
-		
-
-		/*
-    sign = str[i];
-    i++;
-
-    //выполняем действия из буфер+след. число
-    while(str[i]!='\0'){
-        while(!isSign(str[i]) ){
-            right[lenRight]=str[i];
-            i++;
-            lenRight++;
-        }
-
-        mathAction(sign, left, right);
-        sign = str[i];
-				
-				i++;
-    }
-
-
-    int result = atoi(left);
-		*/
-
-    //printf("%d\n", result);
-		//
-		return 0;
+	printf("Result: %d", result);
+	return 0;
 }
