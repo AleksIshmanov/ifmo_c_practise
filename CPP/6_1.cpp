@@ -46,7 +46,7 @@ struct LinkList{
         this->next =new LinkList;
         this->next->student = student;
     }
-} *list;
+};
 
 int main(){
     srand(unsigned(time(0)));
@@ -56,9 +56,8 @@ int main(){
     Session session = {2,2,2,2};
     Student student;
     
-    LinkList* begin;
-    list = new LinkList;
-    begin = list;
+    LinkList* list = new LinkList;
+    LinkList* begin = list;
     
     int count = 0;
     for(int i=0;i<100;i++){
